@@ -27,6 +27,8 @@ def curve_image():
     return send_file("static/curvas/Curves-Comparison.png", mimetype='image/png')
 
 
-if __name__ == "__main__":
+def create_app():
     app.itutor = ITutor.ITutorClassificator()
-    app.run(host='0.0.0.0', port=443)
+    return app
+
+
