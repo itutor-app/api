@@ -14,7 +14,7 @@ def graph():
     data = request.json
     app.itutor.start()
     print(data)
-    return jsonify({"graph": "http://127.0.0.1:5000/graph/image", "curve": "http://127.0.0.1:5000/curve/image"}), 200
+    return jsonify({"graph": "https://itutor-api.herokuapp.com/graph/image", "curve": "https://itutor-api.herokuapp.com/curve/image"}), 200
 
 
 @app.route("/graph/image")
