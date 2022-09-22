@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_file
 import ITutor
 
 app = Flask(__name__)
-app.itutor = ITutor.ITutorClassificator()
+
 
 @app.route("/")
 def home():
@@ -27,7 +27,6 @@ def curve_image():
     return send_file("static/curvas/Curves-Comparison.png", mimetype='image/png')
 
 
-def create_app():
-    return app
-
-
+if __name__ == "__main__":
+    app.itutor = ITutor.ITutorClassificator()
+    app.run(host='0.0.0.0', port=443)
