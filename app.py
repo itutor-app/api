@@ -4,6 +4,11 @@ import ITutor
 app = Flask(__name__)
 
 
+@app.route("/")
+def home():
+    return "Tudo OK"
+
+
 @app.route("/graph", methods=["POST"])
 def graph():
     data = request.json
