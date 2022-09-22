@@ -29,4 +29,6 @@ def curve_image():
 
 if __name__ == "__main__":
     app.itutor = ITutor.ITutorClassificator()
+    print("criou o itutor aqui")
     app.run(host='0.0.0.0', port=443)
+    print("subiu o server")
