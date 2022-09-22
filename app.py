@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_file
 import ITutor
 
 app = Flask(__name__)
-
+app.itutor = ITutor.ITutorClassificator()
 
 @app.route("/")
 def home():
@@ -28,7 +28,6 @@ def curve_image():
 
 
 def create_app():
-    app.itutor = ITutor.ITutorClassificator()
     return app
 
 
