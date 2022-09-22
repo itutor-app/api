@@ -29,4 +29,4 @@ def curve_image():
 
 if __name__ == "__main__":
     app.itutor = ITutor.ITutorClassificator()
-    app.run(host='0.0.0.0', port='443')
+    app.run(host='0.0.0.0', port=443)
