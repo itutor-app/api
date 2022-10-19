@@ -1,1 +1,1 @@
-web: gunicorn app:itutor.app
+web: gunicorn --pythonpath itutor app:app
