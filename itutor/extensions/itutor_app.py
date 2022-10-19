@@ -1,5 +1,4 @@
 from scipy import stats
-import igraph as ig
 from igraph import Graph
 from igraph import plot, save
 import matplotlib.pyplot as plt
@@ -45,7 +44,7 @@ class ITutorClassificator(threading.Thread):
             vertex_shape="rectangle",
             vertex_size=0.3
         )
-        plt.savefig("static/grafos/Graph.png")
+        plt.savefig("./itutor/static/grafos/Graph.png")
 
 
     def CreatePlotComparison(self):
@@ -65,7 +64,7 @@ class ITutorClassificator(threading.Thread):
         plt.plot(self.lista_inter_adj, interacion_norm, '-b')
         plt.plot(self.teoric_sample, teoric_norm, '-g')
         plt.tight_layout()
-        plt.savefig("static/curvas/Curves-Comparison")
+        plt.savefig("./itutor/static/curvas/Curves-Comparison")
 
     def FormatData(self, data):
         list_tuple = {}
