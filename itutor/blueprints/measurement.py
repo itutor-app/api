@@ -10,8 +10,11 @@ def home():
 @bp.route("/graph", methods=["POST"])
 def graph():
     data = request.json
-    current_app.itutor.start()
-    print(data)
+    if data:
+        current_app.itutor.FormatData(data)
+    current_app.itutor.GenerateGraph()
+    current_app.itutor.CreatePlotComparison()
+    current_app.itutor.Reset()
     return jsonify({"graph": "https://itutor-api.herokuapp.com/graph/image", "curve": "https://itutor-api.herokuapp.com/curve/image"}), 200
 
 
