@@ -49,9 +49,6 @@ class ITutorClassificator(threading.Thread):
             vertex_shape="rectangle",
             vertex_size=0.3
         )
-        if os.path.exists("static/grafos") is False:
-            path = os.path.join(os.path.abspath('static'), "grafos")
-            os.mkdir(path)
         plt.savefig(PATH_GRAPH_IMAGE.format(name=self.random_name))#"./itutor/static/grafos/Graph.png"
 
 
@@ -93,10 +90,6 @@ class ITutorClassificator(threading.Thread):
         plt.plot(self.lista_inter_adj, interacion_norm, '-b')
         plt.plot(self.teoric_sample, teoric_norm, '-g')
         plt.tight_layout()
-
-        if os.path.exists("static/curvas") is False:
-            path = os.path.join(os.path.abspath('static'), "curvas")
-            os.mkdir(path)
         plt.savefig(PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
 
     def FormatData(self, data):
