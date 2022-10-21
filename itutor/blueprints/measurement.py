@@ -10,11 +10,9 @@ def home():
 @bp.route("/graph", methods=["POST"])
 def graph():
     data = request.json
-
+    current_app.itutor.Reset()
     if data:
         current_app.itutor.FormatData(data)
-
-    current_app.itutor.Reset()
     current_app.itutor.GenerateRandomName()
     current_app.itutor.GenerateGraph()
     current_app.itutor.CreatePlotComparison()
