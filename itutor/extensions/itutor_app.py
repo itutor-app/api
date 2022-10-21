@@ -52,7 +52,7 @@ class ITutorClassificator(threading.Thread):
         print("meu path: ", os.path.abspath("itutor/static"))
         print("Existe a pasta grafos? ", "Sim" if os.path.exists("static/grafos") else "Não")
         if os.path.exists("static/grafos") is False:
-            os.mkdir("static/grafos")
+            os.mkdir(f"{os.path.abspath('itutor/static')}/grafos")
         plt.savefig(PATH_GRAPH_IMAGE.format(name=self.random_name))#"./itutor/static/grafos/Graph.png"
 
 
@@ -96,7 +96,7 @@ class ITutorClassificator(threading.Thread):
         plt.tight_layout()
         print("Existe a pasta curvas? ", "Sim" if os.path.exists("static/curvas") else "Não")
         if os.path.exists("static/curvas") is False:
-            os.mkdir("static/curvas")
+            os.mkdir(f"{os.path.abspath('itutor/static')}/curvas")
         plt.savefig(PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
 
     def FormatData(self, data):
