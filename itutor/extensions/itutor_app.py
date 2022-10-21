@@ -6,7 +6,7 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 import random
 import threading
-
+import os
 PATH_GRAPH_IMAGE = "static/grafos/{name}-graph.png"
 PATH_CURVE_IMAGE = "static/curvas/{name}-curve"
 
@@ -49,6 +49,10 @@ class ITutorClassificator(threading.Thread):
             vertex_shape="rectangle",
             vertex_size=0.3
         )
+        print("meu path: ", os.path.abspath("itutor/static"))
+        print("Existe a pasta grafos? ", "Sim" if os.path.exists("static/grafos") else "Não")
+        if os.path.exists("static/grafos") is False:
+            os.mkdir("static/grafos")
         plt.savefig(PATH_GRAPH_IMAGE.format(name=self.random_name))#"./itutor/static/grafos/Graph.png"
 
 
@@ -90,6 +94,9 @@ class ITutorClassificator(threading.Thread):
         plt.plot(self.lista_inter_adj, interacion_norm, '-b')
         plt.plot(self.teoric_sample, teoric_norm, '-g')
         plt.tight_layout()
+        print("Existe a pasta curvas? ", "Sim" if os.path.exists("static/curvas") else "Não")
+        if os.path.exists("static/curvas") is False:
+            os.mkdir("static/curvas")
         plt.savefig(PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
 
     def FormatData(self, data):
