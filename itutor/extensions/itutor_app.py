@@ -7,6 +7,9 @@ import numpy as np
 import random
 import threading
 
+PATH_GRAPH_IMAGE = "./itutor/static/grafos/{name}-graph.png"
+PATH_CURVE_IMAGE = "./itutor/static/curvas/{name}-curve"
+
 class ITutorClassificator(threading.Thread):
 
     def __init__(self):
@@ -15,6 +18,8 @@ class ITutorClassificator(threading.Thread):
         self.list_names = []
         self.lista_inter_adj = []
         self.teoric_sample = []
+        self.random_percent = 0.0
+        self.random_name = ""
 
     def GenerateGraph(self):
 
@@ -38,21 +43,42 @@ class ITutorClassificator(threading.Thread):
         plot(
             g,
             target=ax,
-            layout=g.layout("circular"),
+            layout=g.layout("kk"),
             vertex_label=g.vs['name'] if self.list_names != [] else None,
             vertex_color="lightblue",
             vertex_shape="rectangle",
             vertex_size=0.3
         )
-        plt.savefig("./itutor/static/grafos/Graph.png")
+        plt.savefig(PATH_GRAPH_IMAGE.format(name=self.random_name))#"./itutor/static/grafos/Graph.png"
 
 
     def CreatePlotComparison(self):
-        self.lista_inter_adj.sort()
+        #self.lista_inter_adj.sort()
         interacion_norm = stats.norm.cdf(self.lista_inter_adj, loc=0, scale=1)
+        inter_mean = np.mean(self.lista_inter_adj)
+        inter_std = np.std(self.lista_inter_adj)
+
 
         self.teoric_sample = np.linspace(min(self.lista_inter_adj), max(self.lista_inter_adj))
+        teoric_sample_test = [random.randint(min(self.lista_inter_adj), max(self.lista_inter_adj)+1) for x in range(len(self.lista_inter_adj))]
         teoric_norm = stats.norm.cdf(self.teoric_sample, loc=0, scale=1)
+        teoric_mean = np.mean(self.teoric_sample)
+        teoric_std = np.std(self.teoric_sample)
+
+        critico = lambda x: 1.35810/np.sqrt(x)
+
+        print("Tamanho dados interação: ", len(self.lista_inter_adj), "Tamanho dados teoric: ", len(teoric_sample_test))
+        print("Crítico : ", critico(len(self.lista_inter_adj)))
+        print("# SEM MEDIA E DESVIO PADRÃO")
+
+        print(stats.stats.kstest(self.lista_inter_adj, cdf="norm"))
+        print(stats.stats.kstest(self.teoric_sample, cdf="norm"))
+        print("# COM MEDIA E DESVIO PADRÃO")
+        print(stats.stats.kstest(self.lista_inter_adj, cdf="norm", args=(inter_mean, inter_std), N=len(self.lista_inter_adj)))
+        print(stats.stats.kstest(self.teoric_sample, cdf="norm", args=(teoric_mean, teoric_std), N=len(self.teoric_sample)))
+        print("# COMPARAÇÃO ENTRE AMBOS OS DADOS")
+        print(stats.stats.ks_2samp(self.lista_inter_adj, self.teoric_sample))
+
         gs = gridspec.GridSpec(4, 4)
         plt.subplot(gs[:2, :2])
         plt.title("Interaction Curve")
@@ -64,7 +90,7 @@ class ITutorClassificator(threading.Thread):
         plt.plot(self.lista_inter_adj, interacion_norm, '-b')
         plt.plot(self.teoric_sample, teoric_norm, '-g')
         plt.tight_layout()
-        plt.savefig("./itutor/static/curvas/Curves-Comparison")
+        plt.savefig(PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
 
     def FormatData(self, data):
         list_tuple = {}
@@ -83,6 +109,11 @@ class ITutorClassificator(threading.Thread):
         self.list_names = []
         self.lista_inter_adj = []
         self.teoric_sample = []
+        self.random_name = ""
+
+    def GenerateRandomName(self):
+        for x in range(10):
+            self.random_name += random.choice("qwertyuiopasdfghjklçzxcvbnm123456789")
 
     def run(self):
         self.GenerateGraph()
