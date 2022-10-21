@@ -7,8 +7,12 @@ import numpy as np
 import random
 import threading
 import os
-PATH_GRAPH_IMAGE = "static/grafos/{name}-graph.png"
-PATH_CURVE_IMAGE = "static/curvas/{name}-curve"
+
+PATH_GRAPH = os.path.abspath("itutor/static/grafos").replace("\\itutor", "", 1)
+PATH_GRAPH_IMAGE = PATH_GRAPH+"/{name}-graph.png"
+
+PATH_CURVE = os.path.abspath("itutor/static/curvas").replace("\\itutor", "", 1)
+PATH_CURVE_IMAGE = PATH_CURVE+"/{name}-curve"
 
 class ITutorClassificator(threading.Thread):
 
