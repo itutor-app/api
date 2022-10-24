@@ -6,17 +6,11 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 import random
 import threading
-import os
 
-PATH_GRAPH = os.path.abspath("itutor/static/grafos").replace("\\itutor", "", 1)
-PATH_GRAPH_IMAGE = PATH_GRAPH+"/{name}-graph.png"
-
-PATH_CURVE = os.path.abspath("itutor/static/curvas").replace("\\itutor", "", 1)
-PATH_CURVE_IMAGE = PATH_CURVE+"/{name}-curve"
 
 class ITutorClassificator(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, static_path):
         threading.Thread.__init__(self)
         self.list_inter = []
         self.list_names = []
@@ -24,6 +18,8 @@ class ITutorClassificator(threading.Thread):
         self.teoric_sample = []
         self.random_percent = 0.0
         self.random_name = ""
+        self.PATH_GRAPH_IMAGE = static_path + "/{name}-graph.png"
+        self.PATH_CURVE_IMAGE = static_path + "/{name}-curve"
 
     def GenerateGraph(self):
 
@@ -53,7 +49,7 @@ class ITutorClassificator(threading.Thread):
             vertex_shape="rectangle",
             vertex_size=0.3
         )
-        plt.savefig(PATH_GRAPH_IMAGE.format(name=self.random_name))#"./itutor/static/grafos/Graph.png"
+        plt.savefig(self.PATH_GRAPH_IMAGE.format(name=self.random_name))#"./itutor/static/grafos/Graph.png"
 
 
     def CreatePlotComparison(self):
@@ -94,7 +90,7 @@ class ITutorClassificator(threading.Thread):
         plt.plot(self.lista_inter_adj, interacion_norm, '-b')
         plt.plot(self.teoric_sample, teoric_norm, '-g')
         plt.tight_layout()
-        plt.savefig(PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
+        plt.savefig(self.PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
 
     def FormatData(self, data):
         list_tuple = {}
@@ -124,4 +120,4 @@ class ITutorClassificator(threading.Thread):
         self.CreatePlotComparison()
 
 def init_app(app):
-  app.itutor = ITutorClassificator()
+  app.itutor = ITutorClassificator(app.static_folder)
