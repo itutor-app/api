@@ -16,18 +16,18 @@ def graph():
     current_app.itutor.GenerateRandomName()
     current_app.itutor.GenerateGraph()
     current_app.itutor.CreatePlotComparison()
-
-    return jsonify({"graph": f"https://itutor-api.herokuapp.com/graph/{current_app.itutor.random_name}-graph", "random_percent": current_app.itutor.random_percent}), 200
+    print(current_app.config)
+    return jsonify({"graph": f"https://itutor-service-zeifba777q-uc.a.run.app/graph/{current_app.itutor.random_name}-graph", "random_percent": current_app.itutor.random_percent}), 200
 
 
 @bp.route("/graph/<id>")
 def graph_image(id):
-    return send_file(f"static/grafos/{id}.png", mimetype='image/png')
+    return send_file(f"static/{id}.png", mimetype='image/png')
 
 
 @bp.route("/curve/<id>")
 def curve_image(id):
-    return send_file(f"static/curvas/{id}.png", mimetype='image/png')
+    return send_file(f"static/{id}.png", mimetype='image/png')
 
 def init_app(app):
   app.register_blueprint(bp)

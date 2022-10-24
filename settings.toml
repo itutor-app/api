@@ -1,5 +1,5 @@
 [default]
 EXTENSIONS = [
-  'itutor.extensions.itutor_app',
-  'itutor.blueprints.measurement'
+  'extensions.itutor_app',
+  'blueprints.measurement'
 ]
