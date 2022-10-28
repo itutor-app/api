@@ -1,6 +1,6 @@
 from scipy import stats
 from igraph import Graph
-from igraph import plot, save
+from igraph import plot, save, color_name_to_rgba
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
@@ -16,8 +16,9 @@ class ITutorClassificator(threading.Thread):
         self.list_names = []
         self.lista_inter_adj = []
         self.teoric_sample = []
-        self.random_percent = 0.0
+        self.random_percent = 0.9345
         self.random_name = ""
+        self.STATIC_PATH = static_path
         self.PATH_GRAPH_IMAGE = static_path + "/{name}-graph.png"
         self.PATH_CURVE_IMAGE = static_path + "/{name}-curve"
 
@@ -38,18 +39,39 @@ class ITutorClassificator(threading.Thread):
             for y in x:
                 self.lista_inter_adj.append(y)
 
-        fig, ax = plt.subplots()
-
+        # fig, ax = plt.subplots()
+        """
+            PLOT IGRAPH
+        """
         plot(
             g,
-            target=ax,
+            target=self.PATH_GRAPH_IMAGE.format(name=self.random_name),
             layout=g.layout("kk"),
             vertex_label=g.vs['name'] if self.list_names != [] else None,
-            vertex_color="lightblue",
-            vertex_shape="rectangle",
-            vertex_size=0.3
+            vertex_color="rgba(5%, 100%, 100%, 0%)",
+            vertex_frame_color="rgba(5%, 100%, 100%, 0%)",
+            vertex_shape="circle", # circle | rectangle
+            vertex_size=50,
+            edge_width=0.3,
+            edge_arrow_size=1
+            #vertex_label_dist=5
         )
-        plt.savefig(self.PATH_GRAPH_IMAGE.format(name=self.random_name))#"./itutor/static/grafos/Graph.png"
+
+        """
+            MATPLOTLIB PLOT
+        """
+        # plot(
+        #     g,
+        #     target=ax,
+        #     layout="kk",  # print nodes in a circular layout
+        #     vertex_size=0.3,
+        #     vertex_frame_color="white",
+        #     vertex_color="white",
+        #     vertex_label_color=["blue"]*len(g.vs["name"]),
+        #     vertex_label=g.vs['name'] if self.list_names != [] else None,
+        #     vertex_label_size=10.0
+        # )
+        # plt.savefig(self.PATH_GRAPH_IMAGE.format(name=self.random_name+"-matplotlib"))#"./itutor/static/grafos/Graph.png"
 
 
     def CreatePlotComparison(self):
@@ -91,6 +113,7 @@ class ITutorClassificator(threading.Thread):
         plt.plot(self.teoric_sample, teoric_norm, '-g')
         plt.tight_layout()
         plt.savefig(self.PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
+
 
     def FormatData(self, data):
         list_tuple = {}
