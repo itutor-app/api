@@ -9,6 +9,7 @@ def home():
 
 @bp.route("/graph", methods=["POST"])
 def graph():
+    request.method
     data = request.json
     current_app.itutor.Reset()
     if data:
@@ -18,12 +19,12 @@ def graph():
     current_app.itutor.CreatePlotComparison()
     print(current_app.config)
     porcento = f"{current_app.itutor.random_percent*100:.2f}%"
-    return jsonify({"graph": f"https://itutor-service-zeifba777q-uc.a.run.app/graph/{current_app.itutor.random_name}-graph", "random_percent": porcento}), 200
+    return jsonify({"graph": f"https://itutor-service-zeifba777q-uc.a.run.app/graph/{current_app.itutor.random_name}", "random_percent": porcento, "id": current_app.itutor.random_name}), 200
 
 
 @bp.route("/graph/<id>")
 def graph_image(id):
-    return send_file(f"static/{id}.png", mimetype='image/png')
+    return send_file(f"{current_app.itutor.PATH_GRAPH_IMAGE.format(name=id)}", mimetype='image/png')
 
 @bp.route("/graph/delete/<id>", methods=["DELETE"])
 def graph_delete(id):

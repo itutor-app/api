@@ -76,6 +76,7 @@ class ITutorClassificator(threading.Thread):
 
     def CreatePlotComparison(self):
         #self.lista_inter_adj.sort()
+        print("LISTA DE ADJACENTE GRAFO\n", self.lista_inter_adj)
         interacion_norm = stats.norm.cdf(self.lista_inter_adj, loc=0, scale=1)
         inter_mean = np.mean(self.lista_inter_adj)
         inter_std = np.std(self.lista_inter_adj)
@@ -92,7 +93,6 @@ class ITutorClassificator(threading.Thread):
         print("Tamanho dados interação: ", len(self.lista_inter_adj), "Tamanho dados teoric: ", len(teoric_sample_test))
         print("Crítico : ", critico(len(self.lista_inter_adj)))
         print("# SEM MEDIA E DESVIO PADRÃO")
-
         print(stats.stats.kstest(self.lista_inter_adj, cdf="norm"))
         print(stats.stats.kstest(self.teoric_sample, cdf="norm"))
         print("# COM MEDIA E DESVIO PADRÃO")
@@ -100,6 +100,8 @@ class ITutorClassificator(threading.Thread):
         print(stats.stats.kstest(self.teoric_sample, cdf="norm", args=(teoric_mean, teoric_std), N=len(self.teoric_sample)))
         print("# COMPARAÇÃO ENTRE AMBOS OS DADOS")
         print(stats.stats.ks_2samp(self.lista_inter_adj, self.teoric_sample))
+
+        self.random_percent = stats.stats.ks_2samp(self.lista_inter_adj, self.teoric_sample)[0]
 
         gs = gridspec.GridSpec(4, 4)
         plt.subplot(gs[:2, :2])
