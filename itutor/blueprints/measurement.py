@@ -17,9 +17,8 @@ def graph():
     current_app.itutor.GenerateRandomName()
     current_app.itutor.GenerateGraph()
     current_app.itutor.CreatePlotComparison()
-    print(current_app.config)
     porcento = f"{current_app.itutor.random_percent*100:.2f}%"
-    return jsonify({"graph": f"https://itutor-service-zeifba777q-uc.a.run.app/graph/{current_app.itutor.random_name}", "random_percent": porcento, "id": current_app.itutor.random_name}), 200
+    return jsonify({"graph": f"{request.base_url}/{current_app.itutor.random_name}", "random_percent": porcento, "id": current_app.itutor.random_name}), 200
 
 
 @bp.route("/graph/<id>")
@@ -38,7 +37,7 @@ def graph_delete(id):
 
 @bp.route("/curve/<id>")
 def curve_image(id):
-    return send_file(f"static/{id}.png", mimetype='image/png')
+    return send_file(f"{current_app.itutor.PATH_CURVE_IMAGE.format(name=id)}", mimetype='image/png')
 
 def init_app(app):
   app.register_blueprint(bp)

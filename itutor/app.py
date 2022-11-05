@@ -9,5 +9,5 @@ init_app(app)
 load_extensions(app)
 
 if __name__ == "__main__":
-  print("Rodou o app, ip", socket.gethostbyname(socket.gethostname()))
+  print("Rodou o app, ip:", socket.gethostbyname(socket.gethostname()))
   app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)
