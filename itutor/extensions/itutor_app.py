@@ -5,13 +5,11 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import random
-import threading
+from tabulate import tabulate
 
-
-class ITutorClassificator(threading.Thread):
+class ITutorClassificator():
 
     def __init__(self, static_path):
-        threading.Thread.__init__(self)
         self.list_inter = []
         self.list_names = []
         self.lista_inter_adj = []
@@ -33,33 +31,34 @@ class ITutorClassificator(threading.Thread):
             g.vs["name"] = self.list_names
             g.vs["label"] = self.list_names
 
-        self.lista_inter_adj = []
-
-        for x in g.get_adjacency():
-            for y in x:
-                self.lista_inter_adj.append(y)
-
-        # fig, ax = plt.subplots()
+        self.lista_inter_adj = np.matrix(g.get_adjacency().data)
+        matrix = g.get_adjacency().data
+        matrix.insert(0, self.list_names)
+        for index, row in enumerate(matrix[1:]):
+            row.insert(0, self.list_names[index])
+        print(tabulate(matrix, headers='firstrow', tablefmt='fancy_grid'))
         """
             PLOT IGRAPH
         """
         plot(
             g,
             target=self.PATH_GRAPH_IMAGE.format(name=self.random_name),
-            layout=g.layout("kk"),
+            #layout=g.layout("kk"),
             vertex_label=g.vs['name'] if self.list_names != [] else None,
             vertex_color="rgba(5%, 100%, 100%, 0%)",
             vertex_frame_color="rgba(5%, 100%, 100%, 0%)",
-            vertex_shape="circle", # circle | rectangle
-            vertex_size=50,
-            edge_width=0.3,
-            edge_arrow_size=1
-            #vertex_label_dist=5
+            #vertex_shape="circle", # circle | rectangle
+            #vertex_size=35,
+            #edge_width=2,
+            #edge_arrow_size=1,
+            bbox=(400, 400),
+            margin=60
         )
 
         """
             MATPLOTLIB PLOT
         """
+        # fig, ax = plt.subplots()
         # plot(
         #     g,
         #     target=ax,
@@ -75,45 +74,68 @@ class ITutorClassificator(threading.Thread):
 
 
     def CreatePlotComparison(self):
-        #self.lista_inter_adj.sort()
-        print("LISTA DE ADJACENTE GRAFO\n", self.lista_inter_adj)
-        interacion_norm = stats.norm.cdf(self.lista_inter_adj, loc=0, scale=1)
         inter_mean = np.mean(self.lista_inter_adj)
+
+        # -------------------
+        # scale = 3.
+        # range = 10
+        # size = 10000
+        #
+        # X = stats.truncnorm(a=0, b=5, scale=scale).rvs(size=self.lista_inter_adj.shape)
+        # X = X.round().astype(int)
+        #
+        # bins = 2 * range + 1
+        # print("X: ", X)
+        # print("\nBins: ", bins)
+        # x_1d = []
+        # for x in X:
+        #     for y in x:
+        #         x_1d.append(y)
+        # plt.hist(x_1d, bins)
+        # plt.show()
+        # - --------------------------------
+
         inter_std = np.std(self.lista_inter_adj)
-
-
-        self.teoric_sample = np.linspace(min(self.lista_inter_adj), max(self.lista_inter_adj))
-        teoric_sample_test = [random.randint(min(self.lista_inter_adj), max(self.lista_inter_adj)+1) for x in range(len(self.lista_inter_adj))]
-        teoric_norm = stats.norm.cdf(self.teoric_sample, loc=0, scale=1)
+        interacion_norm_cdf = stats.norm.cdf(self.lista_inter_adj, loc=inter_mean, scale=inter_std)
+        self.teoric_sample = np.random.randint(self.lista_inter_adj.max()+1, size=self.lista_inter_adj.shape)
+        teoric_norm_cdf = stats.norm.cdf(self.teoric_sample, loc=inter_mean, scale=inter_std)
         teoric_mean = np.mean(self.teoric_sample)
         teoric_std = np.std(self.teoric_sample)
 
         critico = lambda x: 1.35810/np.sqrt(x)
 
-        print("Tamanho dados interação: ", len(self.lista_inter_adj), "Tamanho dados teoric: ", len(teoric_sample_test))
+        print("Tamanho dados interação: ", len(self.lista_inter_adj), "Tamanho dados teoric: ", len(self.teoric_sample))
         print("Crítico : ", critico(len(self.lista_inter_adj)))
-        print("# SEM MEDIA E DESVIO PADRÃO")
-        print(stats.stats.kstest(self.lista_inter_adj, cdf="norm"))
-        print(stats.stats.kstest(self.teoric_sample, cdf="norm"))
-        print("# COM MEDIA E DESVIO PADRÃO")
-        print(stats.stats.kstest(self.lista_inter_adj, cdf="norm", args=(inter_mean, inter_std), N=len(self.lista_inter_adj)))
-        print(stats.stats.kstest(self.teoric_sample, cdf="norm", args=(teoric_mean, teoric_std), N=len(self.teoric_sample)))
-        print("# COMPARAÇÃO ENTRE AMBOS OS DADOS")
-        print(stats.stats.ks_2samp(self.lista_inter_adj, self.teoric_sample))
 
-        self.random_percent = stats.stats.ks_2samp(self.lista_inter_adj, self.teoric_sample)[0]
+        inter_kstest = stats.stats.kstest(self.lista_inter_adj, cdf="norm")
+        teoric_kstest = stats.stats.kstest(self.teoric_sample, cdf="norm")
+        print("\n# SEM MEDIA E DESVIO PADRÃO\nINTERAÇÃO: ", inter_kstest,
+              "\nTEORICA", teoric_kstest)
 
-        gs = gridspec.GridSpec(4, 4)
-        plt.subplot(gs[:2, :2])
+        inter_kstest_cdf = stats.stats.kstest(interacion_norm_cdf, cdf="norm")
+        teoric_kstest_cdf = stats.stats.kstest(teoric_norm_cdf, cdf="norm")
+        print("\n# CDF - SEM MEDIA E DESVIO PADRÃO\nINTERAÇÃO: ", inter_kstest_cdf,
+              "\nTEORICA", teoric_kstest_cdf)
+
+        inter_kstest_mean_std = stats.stats.kstest(self.lista_inter_adj, cdf="norm", args=(inter_mean, inter_std), N=len(self.lista_inter_adj))
+        teoric_kstest_mean_std = stats.stats.kstest(self.teoric_sample, cdf="norm", args=(teoric_mean, teoric_std), N=len(self.teoric_sample))
+        print("\n# COM MEDIA E DESVIO PADRÃO", "\nINTERAÇÃO: ", inter_kstest_mean_std,"\nTEORIC: ", teoric_kstest_mean_std)
+
+        #inter_teoric_kstest = stats.stats.ks_2samp(self.lista_inter_adj, self.teoric_sample)
+        self.random_percent = inter_kstest[0]
+        #print("\n# COMPARAÇÃO ENTRE AMBOS OS DADOS SEM MEDIA E SEM DESVIO\n", inter_teoric_kstest)
+
+
+
+        print("\nINTERAÇAO NORMAL CDF\n", interacion_norm_cdf)
+        print("\nTEORIC NORMAL CDF\n", teoric_norm_cdf)
+        print("INTERACAO SAMPLE:\n", self.lista_inter_adj)
+        print("\nTEORIC SAMPLE\n", self.teoric_sample)
+
         plt.title("Interaction Curve")
-        plt.plot(self.lista_inter_adj, interacion_norm, '-b')
-        plt.subplot(gs[:2, 2:])
-        plt.title("Teoric Curve")
-        plt.plot(self.teoric_sample, teoric_norm, '-g')
-        plt.subplot(gs[2:4, 1:3])
-        plt.plot(self.lista_inter_adj, interacion_norm, '-b')
-        plt.plot(self.teoric_sample, teoric_norm, '-g')
-        plt.tight_layout()
+        plt.plot(interacion_norm_cdf, self.lista_inter_adj, '-b')
+        #plt.plot(self.teoric_sample, teoric_norm_cdf, '-g')
+        #plt.tight_layout()
         plt.savefig(self.PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
 
 

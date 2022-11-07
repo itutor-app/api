@@ -8,7 +8,7 @@ def home():
 
 
 @bp.route("/graph", methods=["POST"])
-def graph():
+def graph_generate():
     request.method
     data = request.json
     current_app.itutor.Reset()
@@ -21,11 +21,11 @@ def graph():
     return jsonify({"graph": f"{request.base_url}/{current_app.itutor.random_name}", "random_percent": porcento, "id": current_app.itutor.random_name}), 200
 
 
-@bp.route("/graph/<id>")
+@bp.route("/graph/<id>", methods=["GET"])
 def graph_image(id):
     return send_file(f"{current_app.itutor.PATH_GRAPH_IMAGE.format(name=id)}", mimetype='image/png')
 
-@bp.route("/graph/delete/<id>", methods=["DELETE"])
+@bp.route("/graph/<id>", methods=["DELETE"])
 def graph_delete(id):
     try:
         os.remove(current_app.itutor.PATH_GRAPH_IMAGE.format(name=id))
