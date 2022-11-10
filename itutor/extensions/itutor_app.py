@@ -75,32 +75,10 @@ class ITutorClassificator():
 
     def CreatePlotComparison(self):
         inter_mean = np.mean(self.lista_inter_adj)
-
-        # -------------------
-        # scale = 3.
-        # range = 10
-        # size = 10000
-        #
-        # X = stats.truncnorm(a=0, b=5, scale=scale).rvs(size=self.lista_inter_adj.shape)
-        # X = X.round().astype(int)
-        #
-        # bins = 2 * range + 1
-        # print("X: ", X)
-        # print("\nBins: ", bins)
-        # x_1d = []
-        # for x in X:
-        #     for y in x:
-        #         x_1d.append(y)
-        # plt.hist(x_1d, bins)
-        # plt.show()
-        # - --------------------------------
-
         inter_std = np.std(self.lista_inter_adj)
         interacion_norm_cdf = stats.norm.cdf(self.lista_inter_adj, loc=inter_mean, scale=inter_std)
         self.teoric_sample = np.random.randint(self.lista_inter_adj.max()+1, size=self.lista_inter_adj.shape)
         teoric_norm_cdf = stats.norm.cdf(self.teoric_sample, loc=inter_mean, scale=inter_std)
-        teoric_mean = np.mean(self.teoric_sample)
-        teoric_std = np.std(self.teoric_sample)
 
         critico = lambda x: 1.35810/np.sqrt(x)
 
@@ -112,30 +90,12 @@ class ITutorClassificator():
         print("\n# SEM MEDIA E DESVIO PADRÃO\nINTERAÇÃO: ", inter_kstest,
               "\nTEORICA", teoric_kstest)
 
-        inter_kstest_cdf = stats.stats.kstest(interacion_norm_cdf, cdf="norm")
-        teoric_kstest_cdf = stats.stats.kstest(teoric_norm_cdf, cdf="norm")
-        print("\n# CDF - SEM MEDIA E DESVIO PADRÃO\nINTERAÇÃO: ", inter_kstest_cdf,
-              "\nTEORICA", teoric_kstest_cdf)
-
-        inter_kstest_mean_std = stats.stats.kstest(self.lista_inter_adj, cdf="norm", args=(inter_mean, inter_std), N=len(self.lista_inter_adj))
-        teoric_kstest_mean_std = stats.stats.kstest(self.teoric_sample, cdf="norm", args=(teoric_mean, teoric_std), N=len(self.teoric_sample))
-        print("\n# COM MEDIA E DESVIO PADRÃO", "\nINTERAÇÃO: ", inter_kstest_mean_std,"\nTEORIC: ", teoric_kstest_mean_std)
-
-        #inter_teoric_kstest = stats.stats.ks_2samp(self.lista_inter_adj, self.teoric_sample)
         self.random_percent = inter_kstest[0]
-        #print("\n# COMPARAÇÃO ENTRE AMBOS OS DADOS SEM MEDIA E SEM DESVIO\n", inter_teoric_kstest)
-
-
-
-        print("\nINTERAÇAO NORMAL CDF\n", interacion_norm_cdf)
-        print("\nTEORIC NORMAL CDF\n", teoric_norm_cdf)
-        print("INTERACAO SAMPLE:\n", self.lista_inter_adj)
-        print("\nTEORIC SAMPLE\n", self.teoric_sample)
 
         plt.title("Interaction Curve")
         plt.plot(interacion_norm_cdf, self.lista_inter_adj, '-b')
-        #plt.plot(self.teoric_sample, teoric_norm_cdf, '-g')
-        #plt.tight_layout()
+        plt.plot(self.teoric_sample, teoric_norm_cdf, '-g')
+        plt.tight_layout()
         plt.savefig(self.PATH_CURVE_IMAGE.format(name=self.random_name))#"./itutor/static/curvas/Curves-Comparison"
 
 
@@ -144,6 +104,7 @@ class ITutorClassificator():
         for d in data:
             if d["starter"]["registration"] not in list_tuple:
                 list_tuple[d["starter"]["registration"]] = {"name": d["starter"]["name"], "interactions": []}
+                list_tuple[d["finisher"]["registration"]] = {"name": d["finisher"]["name"], "interactions": []}
             list_tuple[d["starter"]["registration"]]["interactions"].append((d["finisher"]["registration"], d["finisher"]["name"]))
         keys = list(list_tuple.keys())
         for i in list_tuple:

@@ -9,7 +9,6 @@ def home():
 
 @bp.route("/graph", methods=["POST"])
 def graph_generate():
-    request.method
     data = request.json
     current_app.itutor.Reset()
     if data:
@@ -18,7 +17,10 @@ def graph_generate():
     current_app.itutor.GenerateGraph()
     current_app.itutor.CreatePlotComparison()
     porcento = f"{current_app.itutor.random_percent*100:.2f}%"
-    return jsonify({"graph": f"{request.base_url}/{current_app.itutor.random_name}", "random_percent": porcento, "id": current_app.itutor.random_name}), 200
+    return jsonify({"graph": f"{request.base_url}/{current_app.itutor.random_name}",
+                    "random_percent": porcento,
+                    "id": current_app.itutor.random_name}),\
+                    200
 
 
 @bp.route("/graph/<id>", methods=["GET"])
