@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app, send_file, make_response, Response
+from flask import Blueprint, jsonify, request, current_app, send_file, redirect
 import os
 
 
@@ -16,10 +16,10 @@ def graph_generate():
         current_app.itutor.FormatData(data)
         current_app.itutor.SetName(data[0]["discussion_id"])
         current_app.itutor.GenerateGraph()
-        current_app.itutor.CreatePlotComparison()
+        current_app.itutor.StartMeasurement()
 
         porcento = f"{current_app.itutor.random_percent*100:.2f}%"
-        return jsonify({"graph": f"{request.base_url}/{current_app.itutor.random_name}",
+        return jsonify({"graph": f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{current_app.itutor.random_name}.png?alt=media",
                         "random_percent": porcento,
                         "id": current_app.itutor.random_name}),\
                         200
@@ -28,7 +28,7 @@ def graph_generate():
 @bp.route("/graph/<id>", methods=["GET"])
 def graph_image(id):
     try:
-        return send_file(f"{current_app.itutor.PATH_GRAPH_IMAGE.format(name=id)}", mimetype='image/png')
+        return redirect(f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{id}.png?alt=media", code=302)
     except:
         return '', 404
         
@@ -36,7 +36,7 @@ def graph_image(id):
 def graph_delete(id):
     try:
         os.remove(current_app.itutor.PATH_GRAPH_IMAGE.format(name=id))
-        os.remove(current_app.itutor.PATH_HIST_IMAGE.format(name=id) + ".png")
+        #os.remove(current_app.itutor.PATH_HIST_IMAGE.format(name=id) + ".png")
         return '', 204
     except Exception as e:
         print(e)

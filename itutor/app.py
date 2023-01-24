@@ -1,11 +1,10 @@
 from flask import Flask
-from extensions.configure import init_app, load_extensions
+from extensions.configure import load_extensions
 import socket
 import os
 
 app = Flask(__name__)
 print("Criou o app flask")
-init_app(app)
 load_extensions(app)
 
 if __name__ == "__main__":
