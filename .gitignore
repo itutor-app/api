@@ -1,3 +1,3 @@
-/venv/
-itutor/static/curvas/*.png
-itutor/static/grafos/*.png
+
+.DS_Store
+netmetric/.DS_Store

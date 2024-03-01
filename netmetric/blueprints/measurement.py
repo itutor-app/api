@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request, current_app, send_file, redirect
 import os
 
-
 bp = Blueprint('measurement', __name__, static_folder='static')
+
+
 @bp.route("/")
 def home():
     return "Tudo OK"
@@ -19,19 +20,26 @@ def graph_generate():
         current_app.itutor.StartMeasurement()
 
         porcento = f"{current_app.itutor.random_percent*100:.2f}%"
-        return jsonify({"graph": f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{current_app.itutor.random_name}.png?alt=media",
+        return jsonify({"graph": f"https://firebasestorage.googleapis.com/v0/b/netmetric.appspot.com/o/{current_app.itutor.random_name}.png?alt=media",
+                        "percent": current_app.itutor.random_percent,
                         "random_percent": porcento,
+                        "interacao": current_app.itutor.list_inter,
+                        "lista_adj": current_app.itutor.lista_inter_adj,
                         "id": current_app.itutor.random_name}),\
                         200
     return "Empty data", 400
 
+
 @bp.route("/graph/<id>", methods=["GET"])
 def graph_image(id):
     try:
-        return redirect(f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{id}.png?alt=media", code=302)
+        return redirect(
+            f"https://firebasestorage.googleapis.com/v0/b/netmetric.appspot.com/o/{id}.png?alt=media",
+            code=302)
     except:
         return '', 404
-        
+
+
 @bp.route("/graph/<id>", methods=["DELETE"])
 def graph_delete(id):
     try:
@@ -42,16 +50,19 @@ def graph_delete(id):
         print(e)
         return '', 404
 
+
 @bp.route("/curve/<id>")
 def curve_image(id):
-    return send_file(f"{current_app.itutor.PATH_HIST_IMAGE.format(name=id)}", mimetype='image/png')
+    return send_file(f"{current_app.itutor.PATH_HIST_IMAGE.format(name=id)}",
+                     mimetype='image/png')
+
 
 @bp.route("/delete-all", methods=["DELETE"])
 def delete_all():
     for file in os.listdir(current_app.itutor.STATIC_PATH):
-        os.remove(current_app.itutor.STATIC_PATH+"/"+file)
+        os.remove(current_app.itutor.STATIC_PATH + "/" + file)
     return "", 204
 
 
 def init_app(app):
-  app.register_blueprint(bp)
+    app.register_blueprint(bp)

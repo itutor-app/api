@@ -3,6 +3,7 @@ from igraph import Graph
 import networkx as nx
 from igraph import plot
 import matplotlib
+import numpy as np
 from scipy.stats import kstest
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -25,14 +26,15 @@ class ITutorClassificator():
         self.random_percent = 0.0
         self.random_name = ""
         self.STATIC_PATH = static_path
-        self.PATH_GRAPH_IMAGE = static_path + "/{name}-graph.png"
-        self.PATH_HIST_IMAGE = static_path + "/{name}-histogram"
+        self.PATH_GRAPH_IMAGE = "{name}-graph.png"
+        self.PATH_HIST_IMAGE = "{name}-histogram"
         self.match_percent = r"(Statistics:\s)(.*)"
 
     def GenerateGraph(self):
 
-        interactions = [(random.randint(1, 50), random.randint(1, 50)) for x in
-                        range(50)] if self.list_inter == [] else self.list_inter
+        interactions = [
+            (random.randint(1, 50), random.randint(1, 50)) for x in range(50)
+        ] if self.list_inter == [] else self.list_inter
 
         g = Graph(interactions, directed=True)
         print("NAMES: ", self.list_inter_names)
@@ -81,9 +83,7 @@ class ITutorClassificator():
             # edge_width=2,
             #edge_arrow_size=1,
             bbox=(350, 600),
-            margin=60
-        )
-
+            margin=60)
 
     # def CreateGraphMatplotLib(self, g):
     #     """
@@ -108,18 +108,28 @@ class ITutorClassificator():
         list_curta.append("...")
         print("VETOR 1D:", list_curta)
         file = os.path.abspath("./extensions/teste_ks.py").replace("\\", "/")
-        data = {"interactions": self.lista_inter_adj, "interactions_r": tuple(self.list_r_input), "image_name": self.PATH_GRAPH_IMAGE.format(name=self.random_name)}
+        data = {
+            "interactions": self.lista_inter_adj,
+            "interactions_r": tuple(self.list_r_input),
+            "image_name": self.PATH_GRAPH_IMAGE.format(name=self.random_name)
+        }
         print(data)
-        p = subprocess.run([sys.executable, file, json.dumps(data)], capture_output=True, text=True)
+        p = subprocess.run(
+            [sys.executable, file, json.dumps(data)],
+            capture_output=True,
+            text=True)
         print("LOG EXECUCAO SUBPROCESS:", p.stdout)
         statistics = None
         try:
-            statistics = re.match(self.match_percent, str(p.stdout)).groups()[1]
+            statistics = re.match(self.match_percent,
+                                  str(p.stdout)).groups()[1]
         except Exception as e:
-            print("Erro de grupo nulo. Valor do subprocess:", p.stdout, "Exception:", e)
+            print("Erro de grupo nulo. Valor do subprocess:", p.stdout,
+                  "Exception:", e)
         print("-------------\nStatistics Recebida:", statistics)
         self.UploadBlob()
-        self.random_percent = 1.0 - kstest(self.lista_inter_adj, cdf="norm")[0]
+        normal_lista_inter_adj = (self.lista_inter_adj - np.mean(self.lista_inter_adj)) / np.std(self.lista_inter_adj)
+        self.random_percent = 1.0 - kstest(normal_lista_inter_adj, cdf="norm")[0]
         # plt.hist(self.lista_inter_adj)
         # plt.savefig(self.PATH_HIST_IMAGE.format(name=self.random_name))
         # plt.clf()
@@ -129,24 +139,35 @@ class ITutorClassificator():
 
         for d in data:
             if d["starter"]["registration"] not in list_tuple:
-                list_tuple[d["starter"]["registration"]] = {"name": d["starter"]["name"], "interactions": []}
+                list_tuple[d["starter"]["registration"]] = {
+                    "name": d["starter"]["name"],
+                    "interactions": []
+                }
 
             if "finisher" in d and d["finisher"]:
                 if d["finisher"]["registration"] not in list_tuple:
-                    list_tuple[d["finisher"]["registration"]] = {"name": d["finisher"]["name"], "interactions": []}
-                list_tuple[d["starter"]["registration"]]["interactions"].append(
-                    (d["finisher"]["registration"], d["finisher"]["name"]))
+                    list_tuple[d["finisher"]["registration"]] = {
+                        "name": d["finisher"]["name"],
+                        "interactions": []
+                    }
+                list_tuple[
+                    d["starter"]["registration"]]["interactions"].append(
+                        (d["finisher"]["registration"], d["finisher"]["name"]))
             else:
-                print("Entrou no Else e adicionou o valor: ", d["starter"]["name"])
-                list_tuple[d["starter"]["registration"]]["interactions"].append(
-                    (d["starter"]["registration"], d["starter"]["name"]))
+                print("Entrou no Else e adicionou o valor: ",
+                      d["starter"]["name"])
+                list_tuple[
+                    d["starter"]["registration"]]["interactions"].append(
+                        (d["starter"]["registration"], d["starter"]["name"]))
 
         keys = list(list_tuple.keys())
         print(list_tuple)
         for i in list_tuple:
             for interaction in list_tuple[i]["interactions"]:
-                self.list_inter.append((keys.index(i), keys.index(interaction[0])))
-                self.list_inter_names.append((list_tuple[i]["name"], interaction[1]))
+                self.list_inter.append(
+                    (keys.index(i), keys.index(interaction[0])))
+                self.list_inter_names.append(
+                    (list_tuple[i]["name"], interaction[1]))
                 self.list_r_input += [list_tuple[i]["name"], interaction[1]]
         self.list_names = [list_tuple[x]["name"] for x in list_tuple]
 
@@ -171,11 +192,12 @@ class ITutorClassificator():
         # The ID of your GCS object
         # destination_blob_name = "storage-object-name"
 
-        storage_client = storage.Client("itutor-32257")
-        bucket = storage_client.bucket("itutor-32257.appspot.com")
-        blob = bucket.blob(self.random_name+".png")
+        storage_client = storage.Client("netmetric")
+        bucket = storage_client.bucket("netmetric.appspot.com")
+        blob = bucket.blob(self.random_name + ".png")
 
-        blob.upload_from_filename(self.PATH_GRAPH_IMAGE.format(name=self.random_name))
+        blob.upload_from_filename(
+            self.PATH_GRAPH_IMAGE.format(name=self.random_name))
 
         print("Upload Sucess")
 
@@ -183,5 +205,6 @@ class ITutorClassificator():
         self.GenerateGraph()
         self.StartMeasurement()
 
+
 def init_app(app):
-  app.itutor = ITutorClassificator(app.static_folder)
+    app.itutor = ITutorClassificator(app.static_folder)
